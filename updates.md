@@ -3,6 +3,22 @@ Since 19th July, 2025 (beta1 in 0.25.0-beta1, 13th July, 2025)
 
 The head note of 0.25 is now in [updates_old.md](https://github.com/vrtmrz/obsidian-livesync/blob/main/updates_old.md). Because 0.25 got a lot of updates, thankfully, compatibility is kept and we do not need breaking changes! In other words, when get enough stabled. The next version will be v1.0.0. Even though it my hope.
 
+## 0.25.80
+
+7th July, 2026
+
+### Fixed
+
+- Improved Markdown conflict auto-merge so that non-overlapping edits are merged while overlapping delete-and-edit cases remain visible for manual resolution (#993).
+  - Behaviour change:
+    - When one side deletes an unchanged line and the other side edits a different region, the deleted line is no longer reintroduced into the merged result.
+    - When one side deletes a line and the other side modifies that same line, the conflict is preserved instead of silently choosing one side.
+- Fixed an issue where applying a newer database entry to storage could incorrectly preserve an older local file as a conflict (#994).
+  - Behaviour change:
+    - Local storage is preserved as a conflict when it may contain unsynchronised changes that are not represented in the revision history. A newer incoming text entry is applied without creating a conflict only when it clearly extends the existing local text.
+- Fixed an issue where choosing Disable and then Overwrite in Hidden File Sync could silently skip hidden files, because the overwrite setup ran while hidden file synchronisation was still disabled (#989, PR #992).
+  - Hidden File Sync is now re-enabled before the Fetch, Overwrite, or Merge initialisation runs, instead of after it completes. If that initialisation fails, the setting may remain enabled.
+
 ## 0.25.79
 
 29th June, 2026
@@ -95,42 +111,6 @@ Also, this update is a very large one, even if we had a lot of time, and we had 
 ### Miscellaneous
 - Some dependencies have been updated.
 - Now we check the compatibility with iOS 15 in the CI tests to ensure the plugin continues to work on older iOS versions even after we upgrade some dependencies.
-
-## 0.25.74
-
-8th June, 2026
-
-### Fixed
-
-- Fixed an issue where disabling hidden file synchronisation did not take effect, allowing non-target hidden files to continue to be processed and synchronised by replication or boot-sequence scan (#941).
-- Prevented the automatic merging of conflicted revisions when one of the revisions has been deleted, which was causing deleted files to reappear (#911).
-- The startup sequence now saves the state more effectively (Thank you so much for @bmcyver)!
-
-## Only CLI
-
-8th June, 2026
-
-I should also consider the version numbering for the CLI...
-
-### Improved
-
-- Added new remote database management commands: `remote-status`, `unlock-remote`, `lock-remote`, and `mark-resolved`.
-- --vault option is now available for daemon and mirror commands! (Thank you so much for @starskyzheng)!
-- Decoupled the database directory path from the actual vault directory path using the `--vault` (or `-V`) option.
-
-### Fixed (preventive)
-
-- Validated that the specified vault path exists and is indeed a directory before starting the CLI.
-- Integrated path resolution and validations for one-off commands (such as `'push'`, `'pull'`, `'cat'`, `'rm'`, `'info'`, and `'resolve'`) against the decoupled vault path instead of the database path.
-
-## 0.25.73
-
-4th June, 2026
-
-### Fixed
-
-- Adjust CouchDB's database name checking to its specification (#926).
-- `Reset Syncronisation on This Device` for minio and P2P is now working properly. 
 
 Full notes are in
 [updates_old.md](https://github.com/vrtmrz/obsidian-livesync/blob/main/updates_old.md).
