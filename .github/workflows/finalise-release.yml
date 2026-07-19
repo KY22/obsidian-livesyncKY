@@ -1,0 +1,101 @@
+name: Finalise Release Tags
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: Release version, for example 0.25.81
+                required: true
+                type: string
+            release_branch:
+                description: Release PR branch. Defaults to the version with dots replaced by underscores.
+                required: false
+                type: string
+            expected_head_sha:
+                description: Full head commit SHA reviewed in the release PR
+                required: true
+                type: string
+
+jobs:
+    finalise:
+        runs-on: ubuntu-latest
+        environment: release
+        permissions:
+            actions: write
+            contents: write
+        steps:
+            - name: Resolve release branch
+              id: branch
+              env:
+                  VERSION: ${{ inputs.version }}
+                  RELEASE_BRANCH_INPUT: ${{ inputs.release_branch }}
+              run: |
+                  set -euo pipefail
+                  BRANCH="${RELEASE_BRANCH_INPUT}"
+                  if [[ -z "${BRANCH}" ]]; then
+                    BRANCH="${VERSION//./_}"
+                  fi
+                  echo "name=${BRANCH}" >> "$GITHUB_OUTPUT"
+
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ steps.branch.outputs.name }}
+                  fetch-depth: 0
+                  submodules: recursive
+
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "24.x"
+
+            - name: Validate release head
+              env:
+                  VERSION: ${{ inputs.version }}
+                  EXPECTED_HEAD_SHA: ${{ inputs.expected_head_sha }}
+              run: |
+                  set -euo pipefail
+                  ACTUAL_HEAD_SHA="$(git rev-parse HEAD)"
+                  if [[ "${ACTUAL_HEAD_SHA}" != "${EXPECTED_HEAD_SHA}" ]]; then
+                    echo "Release branch head is ${ACTUAL_HEAD_SHA}, expected ${EXPECTED_HEAD_SHA}." >&2
+                    exit 1
+                  fi
+                  node utils/release-notes.mjs validate "${VERSION}"
+
+            - name: Ensure and push release tags
+              env:
+                  VERSION: ${{ inputs.version }}
+                  EXPECTED_HEAD_SHA: ${{ inputs.expected_head_sha }}
+              run: |
+                  set -euo pipefail
+                  git fetch --tags --force
+                  node utils/release-tags.mjs ensure "${VERSION}" "${EXPECTED_HEAD_SHA}"
+                  git push --atomic origin "refs/tags/${VERSION}" "refs/tags/${VERSION}-cli"
+
+            - name: Dispatch release workflows
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  VERSION: ${{ inputs.version }}
+              run: |
+                  set -euo pipefail
+                  gh workflow run release.yml \
+                    --ref "${VERSION}" \
+                    --field tag="${VERSION}" \
+                    --field draft=true \
+                    --field prerelease=false
+                  gh workflow run cli-docker.yml \
+                    --ref "${VERSION}-cli" \
+                    --field dry_run=false \
+                    --field force=false
+
+            - name: Summarise next steps
+              env:
+                  VERSION: ${{ inputs.version }}
+              run: |
+                  {
+                    echo "Ensured tags \`${VERSION}\` and \`${VERSION}-cli\` point to the reviewed release commit."
+                    echo ""
+                    echo "Dispatched the plug-in release workflow for \`${VERSION}\`. After approval for the release environment, it creates a draft GitHub Release."
+                    echo "Dispatched the CLI Docker workflow for \`${VERSION}-cli\`. It publishes the version, major-minor, latest, and SHA-qualified image tags."
+                    echo ""
+                    echo "Keep the release pull request in draft after publishing the GitHub Release as the latest stable release. Mark it ready and merge it only after BRAT validation succeeds."
+                  } >> "$GITHUB_STEP_SUMMARY"

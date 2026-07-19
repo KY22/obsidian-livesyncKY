@@ -3,6 +3,77 @@ Since 19th July, 2025 (beta1 in 0.25.0-beta1, 13th July, 2025)
 
 The head note of 0.25 is now in [updates_old.md](https://github.com/vrtmrz/obsidian-livesync/blob/main/updates_old.md). Because 0.25 got a lot of updates, thankfully, compatibility is kept and we do not need breaking changes! In other words, when get enough stabled. The next version will be v1.0.0. Even though it my hope.
 
+## Unreleased
+
+## 0.25.83
+
+16th July, 2026
+
+Our plug-in continues to improve every day thanks to all of your contributions. We have finally resolved an issue first reported in 2023. Thank you for everything you contribute.
+
+### Fixed
+
+- Fixed the 📲 remote-activity indicator remaining visible after CouchDB requests had completed.
+- Fixed missing chunks being reported unavailable while an in-progress on-demand fetch or finite replication could still deliver them. Reads now follow the actual delivery lifecycle and recheck the local database when it finishes.
+- Fixed an issue where changing only the letter case of a file name within the same directory could delete it on other devices when 'Handle files as Case-Sensitive' was disabled. Directory case changes remain unsupported (#198, PR #1014; [commonlib PR #68](https://github.com/vrtmrz/livesync-commonlib/pull/68)). Thank you to @metrovoc for the fix!
+- Fixed **Resolve All conflicted files by the newer one** displaying a separate success notice for every resolved file and updating its progress notice for nine out of every ten checked files. Successful per-file results are now logged, progress updates every ten files, and errors and non-bulk success notices remain visible (#1016, PR #1017). Thank you to @apple-ouyang for the fix!
+
+### Improved
+
+- Split the status-bar remote activity display into `📲` for a finite remote operation and `🌐N` for the approximate number of tracked CouchDB or Object Storage requests currently in progress.
+
+## 0.25.82
+
+15th July, 2026
+
+Recently, I created a repository called Fancy Kit and have been trying to build some proper infrastructure around it. Does any of this look like cumbersome bureaucracy? No need to worry: you can carry on as usual. Codex is simply tidying up my usual rambling prose, terrible pull requests, and disjointed remarks.
+
+### Fixed
+
+- Refreshed the remote Security Seed before each replication, preventing a client that remained open during a remote database rebuild from uploading data encrypted with the previous seed (#1018, PR #1019). Thank you to @apple-ouyang for the fix!
+- The P2P **Start Sync & Close** action now waits for synchronisation to settle before closing the dialogue, avoiding premature release of screen-awake protection while work remains in flight.
+
+### Improved
+
+- On supported mobile and desktop devices, one-shot replication, P2P peer discovery and selection, database rebuild and fetch operations, and remote chunk fetching now keep the screen awake for the duration of these finite remote operations. LiveSync also postpones its normal visibility suspension until the operation finishes, although platform restrictions may still pause or terminate background work.
+- The 📲 status-bar indicator now covers finite remote work as well as HTTP requests. It reports broad remote activity, such as P2P peer selection and remote chunk fetching, rather than an exact physical connection count.
+
+### Improved (CLI)
+
+- CLI container images are now published for both AMD64 and ARM64 platforms.
+
+### Testing
+
+- Added a local real-Obsidian compatibility test that writes an encrypted, path-obfuscated note through the LiveSync CLI and verifies that the plug-in materialises the same content.
+
+## 0.25.81
+
+14th July, 2026
+
+I am releasing this update to make the chunk-boundary fix available before the next broader release. Thank you to everyone who helped reproduce, trace, and verify the issue.
+
+### Fixed
+
+- Fixed an issue where a U+FEFF character at a Rabin–Karp chunk boundary could be lost, changing the reconstructed file and causing repeated size-mismatch conflicts (#1000).
+
+### Improved
+
+- Improved vault scanning and CLI file filtering by reusing compiled ignore patterns, reducing processing overhead for vaults with many files or ignore rules (#1006, #1007, and #1008).
+
+### Improved (CLI and Webapp)
+
+- Rooted storage adapters now reject absolute, drive-qualified, backslash-separated, and traversal paths. They also prevent file writes, appends, and removal from targeting the configured root itself.
+- File System Access API storage can now create files below previously missing parent directories, matching the existing Node behaviour.
+
+### Testing
+
+- Added shared Node and File System Access API storage contract coverage for metadata, text and binary operations, append, listing, removal, path containment, and empty-root handling.
+- Added a Compose-based P2P end-to-end smoke test and repeatable network benchmark cases for local performance investigations.
+
+### Miscellaneous
+
+- Split the internal storage adapter contract into focused capability views without changing existing runtime behaviour.
+
 ## 0.25.80
 
 7th July, 2026

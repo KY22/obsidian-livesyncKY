@@ -491,7 +491,9 @@ Sync automatically after merging files
 #### Keep replication active in the background
 
 Setting key: keepReplicationActiveInBackground
-Desktop only; uses more battery and network.
+Desktop only; uses more battery and network. This setting applies to continuous and periodic replication.
+
+Finite remote operations, including one-shot replication, P2P peer discovery and selection, rebuilds, fetches, and remote chunk fetching, request best-effort screen-awake protection automatically and do not require this setting. That protection does not guarantee execution while Obsidian is hidden or while the operating system suspends the device.
 
 ### 3. Update thinning
 
@@ -856,6 +858,8 @@ If this enabled, all chunks will be stored with the revision made from its conte
 
 Setting key: handleFilenameCaseSensitive
 If this enabled, All files are handled as case-Sensitive (Previous behaviour).
+
+When this setting is disabled, changing only the letter case of a file name within the same directory is synchronised as a rename. Changing the letter case of a directory name is not supported by this handling.
 
 ### 4. Compatibility (Internal API Usage)
 

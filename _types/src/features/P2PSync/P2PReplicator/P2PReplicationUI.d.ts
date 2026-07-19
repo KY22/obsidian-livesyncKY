@@ -1,6 +1,6 @@
 // @ts-nocheck
-// REPO: https://github.com/vrtmrz/livesync-commonlib  Commit hash: 87dc724
-import { App } from "@/deps.ts";
+// REPO: https://github.com/vrtmrz/livesync-commonlib  Commit hash: bbf2539
+import type { App } from "@/deps.ts";
 import type { LiveSyncTrysteroReplicator } from "@lib/replication/trystero/LiveSyncTrysteroReplicator";
 /**
  * Creates an openReplicationUI factory for Obsidian environments.

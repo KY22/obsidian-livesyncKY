@@ -1,5 +1,5 @@
 // @ts-nocheck
-// REPO: https://github.com/vrtmrz/livesync-commonlib  Commit hash: 87dc724
+// REPO: https://github.com/vrtmrz/livesync-commonlib  Commit hash: bbf2539
 import { type EntryDoc, type ObsidianLiveSyncSettings } from "@lib/common/types";
 import { type ProgressInfo } from "@lib/pouchdb/ReplicatorShim";
 import type { Confirm } from "@lib/interfaces/Confirm";
@@ -64,6 +64,7 @@ export declare class TrysteroReplicator {
     get deviceName(): string;
     get platform(): string;
     get confirm(): Confirm;
+    private runFiniteReplicationActivity;
     constructor(env: ReplicatorHostEnv, server?: P2PHost);
     close(): Promise<void>;
     open(): Promise<void>;
