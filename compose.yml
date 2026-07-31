@@ -18,9 +18,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    labels:
-      - "net.unraid.docker.webui=http://[IP]:[PORT:5984]/_utils" # for some reason this does not work properly
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhst/icons/refs/heads/main/png/couchdb.png"
+    # labels:
+    #   - "net.unraid.docker.webui=http://[IP]:[PORT:5984]/_utils" # for some reason this does not work properly
+    #   - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhst/icons/refs/heads/main/png/couchdb.png"
 
 volumes:
   couchdb-obsidian-livesync-data:
