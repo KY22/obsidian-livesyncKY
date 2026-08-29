@@ -8,155 +8,88 @@ None of this would have been possible without your issue reports, pull requests,
 
 This will call for your help once again. I would be very grateful for your co-operation as we build a sounder foundation for the project and its future development.
 
-Earlier releases remain available in the 0.25 release history and the legacy release history.
+Earlier releases remain available in the 1.0 release history, the 1.0 preview history, the 0.25 release history, and the legacy release history.
 
 ## Unreleased
 
-### Interface
+## 1.0.21
+
+26th August, 2026
+
+It is becoming more 'ordinary' with each release, but please let me know if anything has become less convenient.
+
+### Interface and translation
 
 #### Fixed
 
-- The Remediation setting now displays its configured modification-time limit without raising a `HierarchyRequestError`.
+- Remote Configuration section headings no longer overlap their contents when scrolling on mobile. Action buttons in Remote Configuration, Maintenance, and Patches now remain inside the settings pane on narrow screens.
 
-## 1.0.2
+## 1.0.20
 
-31st July, 2026
+~~1.0.19~~ was cancelled because prerelease validation exposed an incorrect warning at start-up.
 
-I am aware that some of the Community Directory review checks have become a little more sensitive again. I will watch them for a little longer, then consider the most appropriate way to adapt.
+25th August, 2026
+
+I know this is the second time I have said it, but I had grown quite fond of the settings screen. It seems, however, that a simpler, healthier life is called for.
+
+### Interface and translation
+
+#### Fixed
+
+- Compatibility pause warnings now direct you to the dedicated compatibility review instead of the Change Log.
+- The Obsidian 1.13 settings page now waits for saved settings before choosing its initial layout. This prevents a spurious missing-replicator warning at start-up, keeps configured devices on the Synchronisation-first layout even when automatic synchronisation triggers are disabled, and keeps Quick Setup first on unconfigured devices.
+
+#### Improved
+
+- Settings page names, controls in General Settings, Quick Setup actions, and Advanced controls now use Obsidian 1.13's native settings interface and global search, while retaining their familiar icons. The landing page keeps Remote Configuration and Sync Settings together, places Appearance, Logging, and Extra menus under General Settings, and groups maintenance, optional features, advanced settings, and help by purpose. Earlier supported Obsidian versions continue to use the pane-based interface.
+- Settings changes which require database initialisation now use a focused Setup Manager dialogue to choose between existing synchronisation data and the files in the current Vault. The selected reset or rebuild is reserved before the settings are saved, while cancelling offers a separate, explicit settings-only fallback.
+
+## 1.0.18
+
+24th August, 2026
+
+### Synchronisation and storage
+
+#### Fixed
+
+- Reset and rebuild workflows now use the local database selected by their updated settings, preventing stale data from reopening after a **Database Suffix** change. If database initialisation does not complete, the workflow remains paused instead of continuing with incomplete state.
+
+#### Improved
+
+- Rebuilds now recheck restored file events against the current Vault, use current file contents, and finish processing them before the plug-in reports readiness.
+
+## 1.0.17
+
+23rd August, 2026
+
+### Interface and translation
+
+#### Fixed
+
+- Settings generated from the settings manifest, Setup Wizard configuration summaries, and warnings about externally changed settings now honour **Display language** when a translation is available, instead of remaining in English (PR #1123). Thank you to @nimula for the contribution!
+
+### Peer-to-peer synchronisation
+
+#### Improved
+
+- P2P connection profiles now provide four **P2P message size** presets and a **Connection path** choice between **Automatic** and **TURN relay only**. Smaller messages can improve compatibility on paths which fragment or drop larger WebRTC messages, while relay-only routing requires a configured TURN server. P2P connection strings and encrypted Setup URIs preserve both choices.
+    - Thank you to @andrewschreiber for the detailed fragmentation diagnosis and working 800-byte threshold in vrtmrz/livesync-commonlib#97, which informed this compatibility design.
+- An optional self-hosted Coturn Compose starter is now available for P2P deployments that need a TURN relay. It uses a pinned upstream image and documents its network, credential, security, and verification boundaries.
+
+## 1.0.16
+
+19th August, 2026
+
+### Conflict handling and recovery
+
+#### Fixed
+
+- **Back to this revision** in Document History now restores the selected content as a new non-deleted successor revision before reflecting it to the Vault. A readable revision restored after a logical deletion therefore remains restored through later synchronisation instead of being overwritten by the deletion.
+    - If the file changes while restoration is in progress, the operation stops instead of extending a stale revision. Existing conflicts remain available through **Inspect conflicts and file/database differences**.
 
 ### Synchronisation and storage
 
 #### Improved
 
-- Downloaded document batches retain best-effort screen-awake and lifecycle protection until every queued file has been applied to local storage, without extending the remote-activity indicator (#1031, PR #1032). Thank you to @apple-ouyang for the improvement!
-
-#### Fixed
-
-- Leading UTF-8 byte order marks are preserved during Vault ingestion, keeping stored content sizes consistent with file metadata and preventing persistent three-byte integrity mismatches (#1056, PR #1058).
-
-### Interface and translation
-
-#### Improved
-
-- Document History now provides previous and next revision controls, reports the current revision position, and disables navigation at the oldest and newest boundaries without changing search-result navigation (#990, PR #1009). Thank you to @SeleiXi for the improvement!
-- Remaining user-visible text in Setup, P2P, Customisation Sync, Global History, JSON conflict handling, and remote configuration now uses the translation catalogue (PR #1015). Thank you to @zeedif for the improvement!
-- Korean translations have broader coverage and corrections for placeholders, punctuation, and established terminology (PR #1055). Thank you to @motolies for the improvement!
-- Spanish translation coverage has been expanded across settings, Setup, P2P, maintenance, and newly catalogued interface text (PR #1059). Thank you to @zeedif for the improvement!
-
-### Command-line tool
-
-#### Fixed
-
-- Large-buffer base64 encoding under Node.js now uses the published `octagonal-wheels` fallback when `FileReader` is unavailable, including correctly handling sliced binary views (#1036, PR #1060; [Fancy Kit PR #44](https://github.com/vrtmrz/fancy-kit/pull/44)).
-
-## 1.0.1
-
-29th July, 2026
-
-I am taking this opportunity to update the experimental features as well.
-
-This maintenance release mainly improves the robustness and maintainability of the experimental WebApp, WebPeer, and shared dialogue composition. Most plug-in users can skip it. I have reviewed the changes through CI and a real Obsidian instance, and I will validate the exact published build before merging the release commit.
-
-### Interface
-
-#### Improved
-
-- Removed a custom positioning workaround from the onboarding Notice so that it follows Obsidian's standard placement and dismissal behaviour.
-- WebApp now points users to **Scan local files** when automatic file observation is unavailable, instead of relying on a fixed browser-version recommendation.
-
-## 1.0.0
-
-27th July, 2026
-
-The work towards 1.0 has become so substantial that I have written [an article about it](https://fancy-syncing.vrtmrz.net/blog/0036-livesync-1_0_0-en.html) (linked again here).
-
-### Setup and compatibility
-
-#### Improved
-
-- An unconfigured Vault now waits for the user to start setup. Onboarding is offered through a persistent Notice and remains available from **Self-hosted LiveSync settings** → **Setup**.
-- Setup now creates named CouchDB, Object Storage, and P2P connections. Setup URIs preserve their connection names and selections, and reserve Fetch or Rebuild before the ordinary start-up scan begins.
-- Manual CouchDB setup distinguishes creating the first database from connecting another device. Onboarding requires a successful connection, while Settings can explicitly save an unverified connection and offers each server-setting correction separately.
-- Compatible differences limited to the chunk hash algorithm, chunk size, or splitter version are aligned automatically by default. Existing chunks remain readable, an explicit opt-out remains available, and differences involving incompatible settings still require review.
-
-#### Fixed
-
-- Existing Vaults retain their effective legacy settings, including the case-insensitive file-name fallback used when an older release had no explicit case setting.
-
-#### Security
-
-- Fly.io setup generates CouchDB and Vault encryption secrets with cryptographically secure randomness.
-- Dependency updates address excessive CPU use from crafted path patterns and `mailto:` links.
-
-### Conflict handling and recovery
-
-#### Improved
-
-- **Not now** postpones repeated automatic merge dialogues while retaining the unresolved-conflict warning. Three or more live revisions are reviewed one reproducible pair at a time, completed pairs remain resolved across restart, and explicit commands can reopen a postponed conflict.
-- **Inspect conflicts and file/database differences** compares the Vault with the database winner and every live conflict revision. Compact indicators show missing chunks, `Δsize`, `Δtime`, whether the Vault matches the winner, and whether conflicts remain.
-- Each reported file and live revision has a compact wrench menu for comparison, applying an exact readable revision, recording an exact byte match, storing the Vault content as a child of a selected branch, retrying missing chunks without changing the tree, or explicitly discarding one selected live branch.
-
-#### Fixed
-
-- Automatic text and structured-data merge now uses the nearest revision actually shared by both branches. A resolution received from another device no longer recreates the same conflict merely because the Vault still contains the exact content of the removed branch.
-- Edits, logical deletions, and renames made while a file remains conflicted extend the revision displayed on that device. When the relationship cannot be proved, LiveSync preserves the branches for review.
-- Unreadable live revisions are preserved during automatic handling. An absent Vault file and a winning logical deletion are treated as agreement unless another live branch still requires attention.
-- Garbage Collection V3 is limited to CouchDB and now protects every live conflict branch, required shared ancestry, and shared chunks. It stops when device progress cannot be verified and reports compaction failure without a contradictory success message.
-
-### P2P and optional synchronisation features
-
-#### Improved
-
-- P2P and Hidden File Sync remain supported opt-in features. Customisation Sync remains a supported Advanced workflow, while Data Compression remains available but disabled by default.
-- P2P controls remain outside the ordinary CouchDB experience until P2P is configured. The current status pane distinguishes announcing changes, following a peer, and persistent per-device actions.
-- P2P setup and guidance now distinguish the required signalling relay from optional TURN and describe the replaceable public relay's privacy and availability limits.
-- Enabling Hidden File Sync opens one progress Notice before saving the setting and reuses it until the initial scan has finished instead of stacking phase, reload, and restart messages.
-
-#### Fixed
-
-- First-device P2P setup can complete its signalling test without another peer online. Fetch on an additional device still requires an available source peer and a completed P2P Rebuild.
-- P2P relay connections now close and are recreated reliably after settings changes and database resets.
-
-### Interface, translation, and operations
-
-#### Improved
-
-- Command-palette actions now use clearer names and appear only when their feature and current context make them usable. Renamed commands retain their identifiers so that existing hotkeys continue to work.
-- Setup and review dialogue text can be selected for copying or translation.
-- Remote-size warnings use persistent clickable Notices. Initial uploads and Rebuild no longer ask to send every chunk in advance; ordinary replication completes the transfer.
-- Obsolete controls for the plug-in trash setting and fixed chunk revisions were removed. The Change Log remains available but no longer opens automatically or tracks an unread count.
-- Self-hosted LiveSync now owns its translation catalogue. Commonlib supplies canonical English to other consumers, while translation contributions can be made in the main Self-hosted LiveSync repository.
-
-#### Fixed
-
-- Applying an available interface translation no longer holds start-up behind an unsolicited dialogue; a persistent Notice opens the existing details on demand.
-- Action buttons are arranged for narrow mobile screens, long dialogues keep their controls reachable, and persistent Notices no longer cover close controls.
-
-### Storage and file selection
-
-#### Fixed
-
-- The optional Custom HTTP Handler used by Object Storage sends the correct byte range from binary request bodies and reports unsupported body types instead of silently sending an empty request.
-- Broadening selectors, ignore rules, size or modification-time limits, or file-name case handling now rechecks previously received files without requiring another remote update.
-- Start-up and full-inspection scans omit built-in legacy LiveSync log files and recovery flag files before comparing Vault and local-database state. Existing ignored database records remain untouched, and user-configured ignore behaviour is unchanged.
-
-### Command-line tool
-
-#### Fixed
-
-- CLI Setup URI validation now uses the supported Commonlib ESM package interface.
-- The non-root Docker image no longer depends on permissions inherited from the source checkout.
-
-#### Security
-
-- The CLI rejects detected path traversal and symbolic-link components before Vault operations.
-
-### Validation
-
-#### Testing
-
-- Expanded automated Real Obsidian coverage for upgrades, two-device synchronisation, CouchDB, Object Storage, P2P, Hidden File Sync, mobile dialogues, conflict and revision recovery, failure diagnostics, and strict clean-up.
-- Real CouchDB integration coverage verifies logical deletion, shared and conflict chunk retention, compaction, downstream replication, and recreation of content-addressed chunks.
-- An encrypted Real Obsidian reconnect scenario replaces the remote Security Seed while one client retains the previous value, verifies that synchronisation adopts the replacement without restoring the old value, and proves a bidirectional encrypted round-trip.
-- The plug-in code in this release was installed through BRAT and validated on macOS, iOS, and Android, including upgrade from 0.25.83, bidirectional synchronisation, P2P setup, conflict handling, recovery controls, mobile layouts, and start-up with existing configurations.
-- Native and non-root Docker CLI scenarios cover setup, write, read, list, information, deletion, conflict resolution, and revision retrieval with the packaged Commonlib dependency.
+- One-shot CouchDB synchronisation now releases stalled web-compatible connection checks before replication starts, so a later synchronisation can make a fresh attempt (Commonlib 0.1.16).
+    - The 60-second safeguard applies only to pre-replication checks. It does not limit ordinary synchronisation, and the **Use Internal API** path is unchanged.

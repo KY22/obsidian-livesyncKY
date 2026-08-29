@@ -120,6 +120,7 @@ export default class ObsidianLiveSyncPlugin extends Plugin {
             UI: services.UI,
             vault: services.vault,
             fileHandler: fileHandler,
+            fileProcessing: services.fileProcessing,
             storageAccess: storageAccess,
             control: services.control,
         });
@@ -169,11 +170,7 @@ export default class ObsidianLiveSyncPlugin extends Plugin {
                 return extraModules;
             },
             (core) => {
-                const addOns = [
-                    new ConfigSync(this, core),
-                    new HiddenFileSync(this, core),
-                    new LocalDatabaseMaintenance(this, core),
-                ];
+                const addOns = [new ConfigSync(core), new HiddenFileSync(core), new LocalDatabaseMaintenance(core)];
                 return addOns;
             },
             (core) => {

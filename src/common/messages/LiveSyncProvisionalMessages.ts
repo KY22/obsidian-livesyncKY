@@ -32,6 +32,20 @@ export const liveSyncProvisionalEnglishMessages = {
     "Learn more about signalling and TURN": "Learn more about signalling and TURN",
     "TURN relays the encrypted WebRTC connection only when a direct path cannot be established. A TURN provider cannot read encrypted Vault contents, but it can observe connection metadata and traffic volume. Use a provider you trust.":
         "TURN relays the encrypted WebRTC connection only when a direct path cannot be established. A TURN provider cannot read encrypted Vault contents, but it can observe connection metadata and traffic volume. Use a provider you trust.",
+    "Connection compatibility": "Connection compatibility",
+    "P2P message size": "P2P message size",
+    Standard: "Standard",
+    Reduced: "Reduced",
+    Conservative: "Conservative",
+    "Maximum compatibility": "Maximum compatibility",
+    "Smaller messages can improve compatibility on paths which fragment or drop larger WebRTC messages. This setting limits outgoing P2P messages, so use a compatible profile on each sending device when required.":
+        "Smaller messages can improve compatibility on paths which fragment or drop larger WebRTC messages. This setting limits outgoing P2P messages, so use a compatible profile on each sending device when required.",
+    "Connection path": "Connection path",
+    "TURN relay only": "TURN relay only",
+    "TURN relay only is available when at least one valid TURN server URL is configured under Advanced Settings.":
+        "TURN relay only is available when at least one valid TURN server URL is configured under Advanced Settings.",
+    "TURN relay only requires at least one valid TURN server URL. Connection path has been restored to Automatic.":
+        "TURN relay only requires at least one valid TURN server URL. Connection path has been restored to Automatic.",
     "Announce changes": "Announce changes",
     "Announce changes automatically after connecting": "Announce changes automatically after connecting",
     "When enabled, this device notifies connected peers after a local change. The notification contains no Vault data; a peer which follows this device then fetches the change through the encrypted P2P connection.":
@@ -49,6 +63,18 @@ export const liveSyncProvisionalEnglishMessages = {
     "Connect to existing database and continue": "Connect to existing database and continue",
     "Test connection and save": "Test connection and save",
     "Save without connecting": "Save without connecting",
+    "Use this device's settings": "Use this device's settings",
+    Retry: "Retry",
+    "No Synchronisation Settings Found": "No Synchronisation Settings Found",
+    "The selected remote has no saved synchronisation settings. This is normal for a new remote. Use this device's settings, or cancel if you expected existing settings.":
+        "The selected remote has no saved synchronisation settings. This is normal for a new remote. Use this device's settings, or cancel if you expected existing settings.",
+    "Could Not Read Synchronisation Settings": "Could Not Read Synchronisation Settings",
+    "Could not read the remote's synchronisation settings. Check the connection and credentials, then retry.":
+        "Could not read the remote's synchronisation settings. Check the connection and credentials, then retry.",
+    "Could not read the remote's synchronisation settings. Retry, or continue the overwrite with this device's settings. A working connection is still required.":
+        "Could not read the remote's synchronisation settings. Retry, or continue the overwrite with this device's settings. A working connection is still required.",
+    "Skips checking and applying synchronisation settings from the remote.":
+        "Skips checking and applying synchronisation settings from the remote.",
     "Enter a complete HTTP or HTTPS URL.": "Enter a complete HTTP or HTTPS URL.",
     "CouchDB validates the database name when you connect. The name must not be empty.":
         "CouchDB validates the database name when you connect. The name must not be empty.",
@@ -138,9 +164,38 @@ export const liveSyncProvisionalEnglishMessages = {
         "Resolve every conflict by modification time? This logically deletes every version except the newest one and cannot recover content which is already unavailable.",
     "Resolve all conflicts by the newest version": "Resolve all conflicts by the newest version",
     "Inspect conflicts and file/database differences": "Inspect conflicts and file/database differences",
-    "Scan every Vault file and live local-database revision for conflicts, missing chunks, and differences. Each result provides actions for the exact revision.":
-        "Scan every Vault file and live local-database revision for conflicts, missing chunks, and differences. Each result provides actions for the exact revision.",
+    "Scan Vault files and local-database Metadata for conflicts, missing chunks, identity mismatches, and differences. Each result provides actions for one exact entry or revision.":
+        "Scan Vault files and local-database Metadata for conflicts, missing chunks, identity mismatches, and differences. Each result provides actions for one exact entry or revision.",
     "Begin inspection": "Begin inspection",
+    "Metadata entry requires review and was left unchanged": "Metadata entry requires review and was left unchanged",
+    "The stored document ID does not match the ID derived from its recorded path.":
+        "The stored document ID does not match the ID derived from its recorded path.",
+    "The stored document ID and recorded path are handled by different synchronisation features.":
+        "The stored document ID and recorded path are handled by different synchronisation features.",
+    "Stored document ID: ${ID}": "Stored document ID: ${ID}",
+    "Expected document ID: ${ID}": "Expected document ID: ${ID}",
+    "Source revision: ${REVISION}": "Source revision: ${REVISION}",
+    "One-step repair is unavailable because this entry is ambiguous, no longer current, or unsafe to change.":
+        "One-step repair is unavailable because this entry is ambiguous, no longer current, or unsafe to change.",
+    "An exact target is already present; repair can remove the obsolete ID.":
+        "An exact target is already present; repair can remove the obsolete ID.",
+    "Repair is available for this entry.": "Repair is available for this entry.",
+    "Repair this Metadata document ID": "Repair this Metadata document ID",
+    "Repair Metadata ID": "Repair Metadata ID",
+    "Keep unchanged": "Keep unchanged",
+    "Repair Metadata document ID": "Repair Metadata document ID",
+    "This moves one local Metadata entry to the ID derived from its recorded path.\n\n**File:** `${FILE}`  \n**Source:** `${SOURCE}@${REVISION}`  \n**Target:** `${TARGET}`\n\nThe target is verified before the source is removed. Its CouchDB revision ancestry cannot be preserved.\n\n> [!warning] Before repairing\n> - Back up this device.\n> - If file-name case or path obfuscation was intentionally changed for the whole database, use Rebuild instead.\n> - If other devices share this database, pause them, allow this device to upload the repair, then resume them one at a time.":
+        "This moves one local Metadata entry to the ID derived from its recorded path.\n\n**File:** `${FILE}`  \n**Source:** `${SOURCE}@${REVISION}`  \n**Target:** `${TARGET}`\n\nThe target is verified before the source is removed. Its CouchDB revision ancestry cannot be preserved.\n\n> [!warning] Before repairing\n> - Back up this device.\n> - If file-name case or path obfuscation was intentionally changed for the whole database, use Rebuild instead.\n> - If other devices share this database, pause them, allow this device to upload the repair, then resume them one at a time.",
+    "Metadata document ID repair and the ordinary Vault scan completed. Run this inspection again after synchronisation.":
+        "Metadata document ID repair and the ordinary Vault scan completed. Run this inspection again after synchronisation.",
+    "Metadata document ID repair completed, but the ordinary Vault scan did not run. Keep synchronisation paused, resolve the scan condition, then run 'Scan storage and database again'.":
+        "Metadata document ID repair completed, but the ordinary Vault scan did not run. Keep synchronisation paused, resolve the scan condition, then run 'Scan storage and database again'.",
+    "The inspected state changed. No repair was performed; run inspection again.":
+        "The inspected state changed. No repair was performed; run inspection again.",
+    "Repair stopped after creating the target. The source was retained. Run inspection again before retrying.":
+        "Repair stopped after creating the target. The source was retained. Run inspection again before retrying.",
+    "Repair failed before the source was removed. Run inspection again before retrying.":
+        "Repair failed before the source was removed. Run inspection again before retrying.",
     "Connection settings": "Connection settings",
     "Saved connections": "Saved connections",
 } as const;

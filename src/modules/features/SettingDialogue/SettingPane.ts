@@ -1,5 +1,10 @@
 import { $msg } from "@/common/translation";
-import { LEVEL_ADVANCED, LEVEL_EDGE_CASE, LEVEL_POWER_USER, type ConfigLevel } from "@vrtmrz/livesync-commonlib/compat/common/types";
+import {
+    LEVEL_ADVANCED,
+    LEVEL_EDGE_CASE,
+    LEVEL_POWER_USER,
+    type ConfigLevel,
+} from "@vrtmrz/livesync-commonlib/compat/common/types";
 import type { AllSettingItemKey, AllSettings } from "./settingConstants";
 
 export const combineOnUpdate = (func1: OnUpdateFunc, func2: OnUpdateFunc): OnUpdateFunc => {
@@ -101,20 +106,28 @@ export function wrapMemo<T>(func: (arg: T) => void) {
         }
     };
 }
+
+/**
+ * Defers pane construction until the owning settings page can confirm that its
+ * render scope is still active.
+ */
+export type DeferredPageElement<T extends HTMLElement = HTMLDivElement> = {
+    then(callback: (value: T) => unknown): void;
+};
+
 export type PageFunctions = {
     addPane: (
         parentEl: HTMLElement,
         title: string,
         icon: string,
         order: number,
-        wizardHidden: boolean,
         level?: ConfigLevel
-    ) => Promise<HTMLDivElement>;
+    ) => DeferredPageElement;
     addPanel: (
         parentEl: HTMLElement,
         title: string,
         callback?: (el: HTMLDivElement) => void,
         func?: OnUpdateFunc,
         level?: ConfigLevel
-    ) => Promise<HTMLDivElement>;
+    ) => DeferredPageElement;
 };

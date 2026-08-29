@@ -10,23 +10,24 @@ import { LiveSyncSetting as Setting } from "./LiveSyncSetting.ts";
 import type { ObsidianLiveSyncSettingTab } from "./ObsidianLiveSyncSettingTab.ts";
 import type { PageFunctions } from "./SettingPane.ts";
 import { visibleOnly } from "./SettingPane.ts";
+import { setButtonAdditionalActionState, setSettingAdditionalActionsState } from "./settingComponentStyles.ts";
 import { PouchDB } from "@vrtmrz/livesync-commonlib/compat/pouchdb/pouchdb-browser";
 import { ExtraSuffixIndexedDB } from "@vrtmrz/livesync-commonlib/compat/common/types";
 import { migrateDatabases } from "./settingUtils.ts";
+import { usesLegacyIndexedDBAdapter } from "@/common/compatibilitySettings.ts";
 
 export function panePatches(this: ObsidianLiveSyncSettingTab, paneEl: HTMLElement, { addPanel }: PageFunctions): void {
     void addPanel(paneEl, "Compatibility (Metadata)").then((paneEl) => {
-        new Setting(paneEl).setClass("wizardHidden").autoWireToggle("deleteMetadataOfDeletedFiles");
+        new Setting(paneEl).autoWireToggle("deleteMetadataOfDeletedFiles");
 
-        new Setting(paneEl).setClass("wizardHidden").autoWireNumeric("automaticallyDeleteMetadataOfDeletedFiles", {
+        new Setting(paneEl).autoWireNumeric("automaticallyDeleteMetadataOfDeletedFiles", {
             onUpdate: visibleOnly(() => this.isConfiguredAs("deleteMetadataOfDeletedFiles", true)),
         });
     });
 
     void addPanel(paneEl, "Compatibility (Conflict Behaviour)").then((paneEl) => {
-        paneEl.addClass("wizardHidden");
-        new Setting(paneEl).setClass("wizardHidden").autoWireToggle("disableMarkdownAutoMerge");
-        new Setting(paneEl).setClass("wizardHidden").autoWireToggle("writeDocumentsIfConflicted");
+        new Setting(paneEl).autoWireToggle("disableMarkdownAutoMerge");
+        new Setting(paneEl).autoWireToggle("writeDocumentsIfConflicted");
     });
 
     void addPanel(paneEl, "Compatibility (Database structure)").then((paneEl) => {
@@ -75,7 +76,8 @@ export function panePatches(this: ObsidianLiveSyncSettingTab, paneEl: HTMLElemen
             }
         };
         {
-            const infoClass = this.editingSettings.useIndexedDBAdapter ? "op-warn" : "op-warn-info";
+            const useIndexedDBAdapter = usesLegacyIndexedDBAdapter(this.editingSettings);
+            const infoClass = useIndexedDBAdapter ? "op-warn" : "op-warn-info";
             paneEl.createDiv({
                 text: "The IndexedDB adapter often offers superior performance in certain scenarios, but it has been found to cause memory leaks when used with LiveSync mode. When using LiveSync mode, please use IDB adapter instead.",
                 cls: infoClass,
@@ -88,8 +90,8 @@ export function panePatches(this: ObsidianLiveSyncSettingTab, paneEl: HTMLElemen
                 .setName("Database Adapter")
                 .setDesc("Select the database adapter to use. ");
             const el = setting.controlEl.createDiv({});
-            el.setText(`Current adapter: ${this.editingSettings.useIndexedDBAdapter ? "IndexedDB" : "IDB"}`);
-            if (!this.editingSettings.useIndexedDBAdapter) {
+            el.setText(`Current adapter: ${useIndexedDBAdapter ? "IndexedDB" : "IDB"}`);
+            if (!useIndexedDBAdapter) {
                 setting.addButton((button) => {
                     button.setButtonText("Switch to IndexedDB").onClick(async () => {
                         Logger("Migrating all data to IndexedDB...", LOG_LEVEL_NOTICE);
@@ -113,7 +115,7 @@ export function panePatches(this: ObsidianLiveSyncSettingTab, paneEl: HTMLElemen
                 });
             }
         }
-        new Setting(paneEl).autoWireToggle("handleFilenameCaseSensitive", { holdValue: true }).setClass("wizardHidden");
+        new Setting(paneEl).autoWireToggle("handleFilenameCaseSensitive", { holdValue: true });
     });
 
     void addPanel(paneEl, "Compatibility (Internal API Usage)").then((paneEl) => {
@@ -158,7 +160,7 @@ export function panePatches(this: ObsidianLiveSyncSettingTab, paneEl: HTMLElemen
     });
     void addPanel(paneEl, "Edge case addressing (Behaviour)").then((paneEl) => {
         new Setting(paneEl).autoWireToggle("doNotSuspendOnFetching");
-        new Setting(paneEl).setClass("wizardHidden").autoWireToggle("doNotDeleteFolder");
+        new Setting(paneEl).autoWireToggle("doNotDeleteFolder");
         new Setting(paneEl).autoWireToggle("processSizeMismatchedFiles");
     });
 
@@ -176,7 +178,7 @@ export function panePatches(this: ObsidianLiveSyncSettingTab, paneEl: HTMLElemen
         new Setting(paneEl).autoWireToggle("disableCheckingConfigMismatch");
     });
     void addPanel(paneEl, "Remediation").then((paneEl) => {
-        const setting = new Setting(paneEl);
+        const setting = setSettingAdditionalActionsState(new Setting(paneEl));
         const dateEl = setting.controlEl.createSpan();
         setting
             .addText((text) => {
@@ -214,6 +216,9 @@ export function panePatches(this: ObsidianLiveSyncSettingTab, paneEl: HTMLElemen
             })
             .setAuto("maxMTimeForReflectEvents")
             .addApplyButton(["maxMTimeForReflectEvents"]);
+        if (setting.applyButtonComponent) {
+            setButtonAdditionalActionState(setting.applyButtonComponent);
+        }
 
         this.addOnSaved("maxMTimeForReflectEvents", async (key) => {
             const buttons = ["Restart Now", "Later"] as const;

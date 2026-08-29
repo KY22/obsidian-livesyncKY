@@ -47,6 +47,14 @@ Do not switch to P2P or reset the database as the first response. Check:
 
 If the remote is healthy but one device's local database is not, use [Reset Synchronisation on This Device](recovery.md#reset-synchronisation-on-this-device) only after backing up unsynchronised local files.
 
+## Synchronisation is paused for compatibility review
+
+A compatibility review is separate from the Change Log. It can appear after an internal database or settings-format change, or when a configured Vault is copied, restored, or opened in a new Obsidian profile without its device-local acknowledgement.
+
+The **Synchronisation paused for compatibility review** dialogue opens after the Obsidian layout is ready. If it has been closed, use the persistent Notice's **Review why** link, or run `Review why synchronisation is paused` from the command palette. Opening **Change Log** does not clear the pause.
+
+Review the stated reason before continuing. When **Resume synchronisation** is available, first update every synchronising device, then use that action to record the current internal database version and restore the configured synchronisation behaviour. If the action is unavailable, the running installation is older than the recorded database or settings format. Update that installation instead of resetting the database merely to remove the warning.
+
 ## Files are missing or excluded
 
 Check Obsidian's `Detect all file extensions`, LiveSync selectors, ignore files, file-size limits, modification-time limits, and Hidden File Sync rules. A filtered file is different from a file which reached the database but could not be reconstructed from its chunks.
@@ -58,13 +66,21 @@ If the log reports missing chunks or a size mismatch:
 3. synchronise a device or restore a backup which still has the correct content;
 4. on that healthy device, run `Recreate chunks for current Vault files`, then synchronise;
 5. follow [Recover a conflicted or mismatched file](recovery.md#recover-a-conflicted-or-mismatched-file); run `Inspect conflicts and file/database differences` from `Hatch`, then use each revision's wrench menu to review and act on that exact branch; and
-6. use `Discard this branch` only after confirming that the exact live branch is no longer wanted. Use the separate `Discard unreadable revision` recovery action only when an unreadable revision is the sole live leaf.
+6. use `Discard this branch` only after confirming that the exact current branch is no longer wanted. Use the separate `Discard unreadable revision` recovery action only when an unreadable revision is the sole current leaf.
 
-The repair card uses compact diagnostic rows which remain readable in a narrow mobile settings pane. `🧩 Missing chunks: N` marks an unreadable revision. In the database row, `Δsize` means decoded size minus recorded size; `Δsize vs DB` means Vault size minus decoded database size; and `Δtime` means Vault modification time minus database modification time. These are diagnostic values, not a rule for deciding which revision is correct. `✅ Vault matches winner · ⚠️ Conflicts: N` means that the current Vault bytes agree with the database winner while other live branches still need a decision. Every mutating action rechecks that its selected revision is still live. Applying a logical deletion to an existing Vault file requires confirmation; a logical-deletion winner with no Vault file already agrees and is omitted.
+The repair card uses compact diagnostic rows which remain readable in a narrow mobile settings pane. `🧩 Missing chunks: N` marks an unreadable revision. In the database row, `Δsize` means decoded size minus recorded size; `Δsize vs DB` means Vault size minus decoded database size; and `Δtime` means Vault modification time minus database modification time. These are diagnostic values, not a rule for deciding which revision is correct. `✅ Vault matches winner · ⚠️ Conflicts: N` means that the current Vault bytes agree with the database winner while other conflict branches still need a decision. Every mutating action rechecks that its selected revision is still a current leaf. Applying a logical deletion to an existing Vault file requires confirmation; a logical-deletion winner with no Vault file already agrees and is omitted.
 
-`Retry reading revision` does not change the revision tree. `Discard this branch` creates a logical deletion on one exact live revision while another live branch remains and leaves the current Vault file unchanged. If the discarded revision was recorded as the Vault's exact source, that stale device-local provenance is removed. `Discard unreadable revision` provides the corresponding explicit escape hatch for a sole unreadable live leaf. Neither action purges history or reconstructs missing content. An unavailable non-live ancestor cannot be deleted through this workflow; it disables conservative three-way merge but does not prevent explicit selection between readable live revisions.
+`Retry reading revision` does not change the revision tree. `Discard this branch` creates a logical deletion on one exact current leaf while another current leaf remains and leaves the current Vault file unchanged. If the discarded revision was recorded as the Vault's exact source, that stale device-local provenance is removed. `Discard unreadable revision` provides the corresponding explicit escape hatch for a sole unreadable current leaf. Neither action purges history or reconstructs missing content. An unavailable ancestor which is not a current leaf cannot be deleted through this workflow; it disables conservative three-way merge but does not prevent explicit selection between readable current leaves.
 
 `Recreate chunks for current Vault files` uses current Vault content. It cannot recreate unique bytes which exist only in an unreadable historical or conflict revision.
+
+## A Metadata entry requires review
+
+When **Inspect conflicts and file/database differences** reports `Metadata entry requires review and was left unchanged`, the local database contains Metadata whose stored document ID does not agree with the ID derived from its recorded path. LiveSync withholds that entry from ordinary file reflection and deletion rather than guessing which identity is intended. The inspection is local and does not query the remote.
+
+Do not change file-name case handling or path obfuscation merely to make the displayed IDs agree. Follow [Repair a Metadata document ID mismatch](recovery.md#repair-a-metadata-document-id-mismatch) when the card offers **Repair this Metadata document ID**. If no repair action is offered, the entry is ambiguous, conflicted, deleted, outside the normal-file namespace, or otherwise unsafe for one-entry repair. Preserve the evidence and use the wider recovery guidance instead of forcing a target ID.
+
+If many entries reflect deliberate folder-name or ID-derivation differences across devices, choose an authoritative Vault and use the established Rebuild workflow. A one-entry repair is not a distributed rename or database migration.
 
 ## A configuration mismatch dialogue blocks synchronisation
 
@@ -117,6 +133,8 @@ Enable Obsidian's `Detect all file extensions`, then check LiveSync selectors, i
 
 ## Collect a report
 
+Follow [How to report an issue](to_issue_reporting.md) for the complete reporting checklist, including Obsidian debug information and the privacy review required before sharing evidence.
+
 Run `Generate full report for opening the issue with debug info` to copy the current settings summary and recent verbose log lines. Remove credentials, remote URLs, Vault names, file contents, and other private information before sharing it.
 
 When a problem concerns one file, run **Copy database information for the active file**, or use **Hatch** → **Copy database information for a file** to select another file. The report describes this device's local database view, including the Vault-relative path, document and chunk identifiers, local database revisions, conflicts, and local chunk availability. It does not query the remote server or include file contents. Treat paths and identifiers as private metadata before sharing.
@@ -131,7 +149,7 @@ Browser security errors, particularly CORS failures, may reach the plug-in only 
 
 LiveSync stores file metadata, chunks, revision history, conflicts, deletions, and tombstones. Deleting or shortening a file therefore does not immediately remove every object which once represented it.
 
-Garbage Collection V3 can remove unreferenced chunks from a healthy CouchDB setup, but it is appropriate only when the Vault and local database are healthy and all relevant devices have synchronised. Current files and live conflict branches protect their required chunks; an ordinary superseded revision does not. Tombstones and retained metadata are not free, so Garbage Collection does not guarantee a minimal database. Review the [Garbage Collection V3 specification](specs_garbage_collection.md) before using it.
+Garbage Collection V3 can remove unreferenced chunks from a healthy CouchDB setup, but it is appropriate only when the Vault and local database are healthy and all relevant devices have synchronised. Current files and conflict branches protect their required chunks; an ordinary superseded revision does not. Tombstones and retained metadata are not free, so Garbage Collection does not guarantee a minimal database. Review the [Garbage Collection V3 specification](specs_garbage_collection.md) before using it.
 
 `Overwrite Server Data with This Device's Files` is a separate rebuild operation and is the more certain way to reconstruct a central remote from a chosen authoritative Vault. It is also destructive and may discard changes which exist only on another device. Review [Recovery and flag files](recovery.md#garbage-collection-is-not-rebuild) before choosing between them.
 

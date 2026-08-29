@@ -18,9 +18,12 @@ vi.mock("@vrtmrz/livesync-commonlib/compat/common/utils", async (importOriginal)
 });
 vi.mock("@/features/LiveSyncCommands", () => ({
     LiveSyncCommands: class LiveSyncCommands {
-        core!: { settings: unknown };
+        core!: { settings: unknown; services: unknown };
         get settings() {
             return this.core.settings;
+        }
+        get services() {
+            return this.core.services;
         }
     },
 }));
@@ -76,11 +79,13 @@ describe("LocalDatabaseMaintenance prerequisites", () => {
         };
         const maintenance = Object.create(LocalDatabaseMaintenance.prototype) as LocalDatabaseMaintenance;
         Object.assign(maintenance, {
-            plugin: {
-                addCommand: vi.fn((command) => commands.push(command)),
-            },
             core: {
                 settings,
+                services: {
+                    API: {
+                        addCommand: vi.fn((command) => commands.push(command)),
+                    },
+                },
             },
             _isDatabaseReady: vi.fn(() => true),
         });
@@ -222,6 +227,7 @@ describe("LocalDatabaseMaintenance Garbage Collection V3", () => {
         const remoteDatabase = {
             compact: vi.fn(async () => ({ ok: true })),
             info: vi.fn(async () => ({ compact_running: true })),
+            close: vi.fn(async () => undefined),
         };
         Object.assign(maintenance, {
             core: {
@@ -243,6 +249,7 @@ describe("LocalDatabaseMaintenance Garbage Collection V3", () => {
             "Compaction on remote database completed successfully.",
             "gc-compact"
         );
+        expect(remoteDatabase.close).toHaveBeenCalledOnce();
     });
 
     it.each([
